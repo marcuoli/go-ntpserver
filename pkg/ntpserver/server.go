@@ -14,6 +14,10 @@ var ErrAlreadyRunning = errors.New("ntpserver: already running")
 type Config struct {
 	ListenAddr string
 
+	// Network specifies the network type: "udp" (both IPv4/IPv6), "udp4" (IPv4 only), or "udp6" (IPv6 only).
+	// Defaults to "udp" for dual-stack.
+	Network string
+
 	// Clock defaults to a system UTC clock.
 	Clock Clock
 
@@ -58,6 +62,9 @@ func (c Config) normalize() Config {
 	out := c
 	if out.ListenAddr == "" {
 		out.ListenAddr = "0.0.0.0:123"
+	}
+	if out.Network == "" {
+		out.Network = "udp"
 	}
 	if out.Clock == nil {
 		out.Clock = systemClock{}
@@ -121,7 +128,7 @@ func (s *Server) Start(ctx context.Context) error {
 	s.stopOnce = sync.Once{}
 	s.mu.Unlock()
 
-	udpAddr, err := net.ResolveUDPAddr("udp", s.cfg.ListenAddr)
+	udpAddr, err := net.ResolveUDPAddr(s.cfg.Network, s.cfg.ListenAddr)
 	if err != nil {
 		s.mu.Lock()
 		s.running = false
@@ -129,7 +136,7 @@ func (s *Server) Start(ctx context.Context) error {
 		return err
 	}
 
-	conn, err := net.ListenUDP("udp", udpAddr)
+	conn, err := net.ListenUDP(s.cfg.Network, udpAddr)
 	if err != nil {
 		s.mu.Lock()
 		s.running = false
