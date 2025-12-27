@@ -3,10 +3,10 @@ package ntpserver
 
 const (
 	// Version is the semantic version of the library.
-	Version = "0.1.0"
+	Version = "0.2.0"
 
 	VersionMajor = 0
-	VersionMinor = 1
+	VersionMinor = 2
 	VersionPatch = 0
 )
 

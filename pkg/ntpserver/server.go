@@ -3,6 +3,7 @@ package ntpserver
 import (
 	"context"
 	"errors"
+	"log"
 	"net"
 	"sync"
 	"time"
@@ -45,6 +46,12 @@ type Config struct {
 	// Hook is called after parsing and basic checks, before responding.
 	// If it returns a non-empty string, the request is dropped.
 	Hook PacketHook
+
+	// Logger for debug/info messages. If nil, no logging is performed.
+	Logger *log.Logger
+
+	// Debug enables verbose debug logging.
+	Debug bool
 }
 
 func (c Config) normalize() Config {
@@ -135,6 +142,10 @@ func (s *Server) Start(ctx context.Context) error {
 	s.metrics.reset(time.Now().UTC())
 	s.mu.Unlock()
 
+	if s.cfg.Logger != nil {
+		s.cfg.Logger.Printf("[INFO] NTP server started on %s (stratum %d)", s.cfg.ListenAddr, s.cfg.Stratum)
+	}
+
 	s.wg.Add(1)
 	go s.serveLoop(ctx)
 	return nil
@@ -223,6 +234,12 @@ func (s *Server) serveLoop(ctx context.Context) {
 		}
 
 		s.metrics.incRequest(clientIP, receivedAt)
+
+		if s.cfg.Debug && s.cfg.Logger != nil {
+			s.cfg.Logger.Printf("[DEBUG] NTP request from %s:%d", clientIP, clientPort)
+		} else if s.cfg.Logger != nil {
+			s.cfg.Logger.Printf("[INFO] NTP request from %s", clientIP)
+		}
 
 		ev := RequestEvent{
 			At:         receivedAt,
