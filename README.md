@@ -32,3 +32,13 @@ go run ./cmd/ntpserver -listen 0.0.0.0:123
 - This server implements a minimal, working subset (SNTP-style responder).
 
 Note: There is no RFC for a "multithreaded" NTP server; concurrency is an implementation detail.
+
+## Versioning
+
+This library uses semantic versioning.
+
+- Default bump for routine changes (tests, bugfixes, small improvements): increment **patch** ($0.3.x \rightarrow 0.3.(x+1)$)
+- Increment **minor** only when adding backwards-compatible features that materially change behavior or public API
+- Increment **major** only for breaking changes
+
+The source of truth lives in `pkg/ntpserver/version.go`.
