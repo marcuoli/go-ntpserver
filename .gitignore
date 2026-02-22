@@ -3,3 +3,10 @@ bin/
 *.test
 *.out
 .DS_Store
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
