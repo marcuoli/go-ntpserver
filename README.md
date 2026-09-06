@@ -26,6 +26,18 @@ defer srv.Stop()
 go run ./cmd/ntpserver -listen 0.0.0.0:123
 ```
 
+## Build with WSLC
+
+On Windows, the default build runs in the Go version declared by `go.mod` and writes the Linux executable to `bin/ntpserver`:
+
+```powershell
+make build
+# Or run the wrapper directly:
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/build-wslc.ps1
+```
+
+This requires WSLC 2.9.3 or newer.
+
 ## Protocol
 
 - Core protocol: RFC 5905 (NTPv4)
